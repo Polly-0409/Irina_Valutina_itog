@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель прайса</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section class="price">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Управление</span>
+        <div class="section-divider"></div>
+        <h1>Админ-панель прайса</h1>
+        <p>Редактируйте разделы, услуги и цены. Изменения сохраняются локально в этом браузере.</p>
+      </div>
+
+      <div class="price-cta" style="max-width:1000px;margin:0 auto 20px;">
+        <p class="price-cta-lead">Действия</p>
+        <p>После редактирования нажмите «Сохранить изменения». Чтобы вернуться к исходному прайсу, нажмите «Сбросить к базовому».</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" id="saveBtn" type="button">Сохранить изменения</button>
+          <button class="btn" id="resetBtn" type="button" style="background:#e8dccd;color:#1a120b;">Сбросить к базовому</button>
+          <a class="btn" href="index.html" style="background:#f3e9dc;color:#1a120b;">Открыть сайт</a>
+        </div>
+      </div>
+
+      <div id="adminSections" class="price-groups"></div>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="btn btn-primary" id="addSectionBtn" type="button">Добавить раздел</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="services-data.js"></script>
+  <script>
+    let state = JSON.parse(JSON.stringify(getPriceGroups()));
+
+    function createInput(labelText, value, onInput) {
+      const wrap = document.createElement("label");
+      wrap.style.display = "flex";
+      wrap.style.flexDirection = "column";
+      wrap.style.gap = "6px";
+      wrap.style.fontSize = "0.84rem";
+      wrap.style.color = "var(--color-text-muted)";
+
+      const label = document.createElement("span");
+      label.textContent = labelText;
+      const input = document.createElement("input");
+      input.value = value || "";
+      input.style.padding = "10px 12px";
+      input.style.border = "1px solid var(--color-border)";
+      input.style.borderRadius = "10px";
+      input.style.font = "inherit";
+      input.addEventListener("input", (e) => onInput(e.target.value));
+      wrap.append(label, input);
+      return wrap;
+    }
+
+    function renderAdmin() {
+      const root = document.getElementById("adminSections");
+      root.innerHTML = "";
+
+      state.forEach((section, sectionIdx) => {
+        const card = document.createElement("article");
+        card.className = "price-group";
+        card.style.background = "#fff";
+
+        const head = document.createElement("div");
+        head.className = "price-group-head";
+        head.style.alignItems = "flex-start";
+        head.style.flexDirection = "column";
+
+        const topControls = document.createElement("div");
+        topControls.style.display = "grid";
+        topControls.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 1fr))";
+        topControls.style.gap = "10px";
+        topControls.style.width = "100%";
+
+        topControls.append(
+          createInput("Название раздела", section.title, (v) => section.title = v),
+          createInput("Бейдж раздела", section.badge, (v) => section.badge = v)
+        );
+
+        const removeSectionBtn = document.createElement("button");
+        removeSectionBtn.type = "button";
+        removeSectionBtn.className = "btn";
+        removeSectionBtn.style.background = "#f6dfdc";
+        removeSectionBtn.style.color = "#5e231b";
+        removeSectionBtn.style.padding = "10px 16px";
+        removeSectionBtn.textContent = "Удалить раздел";
+        removeSectionBtn.addEventListener("click", () => {
+          state.splice(sectionIdx, 1);
+          renderAdmin();
+        });
+
+        head.append(topControls, removeSectionBtn);
+        card.append(head);
+
+        const list = document.createElement("div");
+        list.style.display = "flex";
+        list.style.flexDirection = "column";
+        list.style.gap = "10px";
+        list.style.marginTop = "12px";
+
+        section.items = section.items || [];
+        section.items.forEach((item, itemIdx) => {
+          const itemBox = document.createElement("div");
+          itemBox.style.border = "1px solid var(--color-border-light)";
+          itemBox.style.borderRadius = "12px";
+          itemBox.style.padding = "12px";
+          itemBox.style.display = "grid";
+          itemBox.style.gridTemplateColumns = "2fr 1fr 1fr auto";
+          itemBox.style.gap = "10px";
+          itemBox.style.alignItems = "end";
+
+          itemBox.append(
+            createInput("Услуга", item.name, (v) => item.name = v),
+            createInput("Длительность", item.duration, (v) => item.duration = v),
+            createInput("Цена", item.price, (v) => item.price = v)
+          );
+
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "btn";
+          delBtn.style.background = "#f6dfdc";
+          delBtn.style.color = "#5e231b";
+          delBtn.style.padding = "10px 14px";
+          delBtn.textContent = "Удалить";
+          delBtn.addEventListener("click", () => {
+            section.items.splice(itemIdx, 1);
+            renderAdmin();
+          });
+          itemBox.append(delBtn);
+          list.append(itemBox);
+        });
+
+        const addItemBtn = document.createElement("button");
+        addItemBtn.type = "button";
+        addItemBtn.className = "btn";
+        addItemBtn.style.background = "#f0e5d6";
+        addItemBtn.style.color = "#1a120b";
+        addItemBtn.style.marginTop = "8px";
+        addItemBtn.textContent = "Добавить услугу";
+        addItemBtn.addEventListener("click", () => {
+          section.items.push({ name: "Новая услуга", duration: "30 мин", price: "1 000 ₽" });
+          renderAdmin();
+        });
+
+        card.append(list, addItemBtn);
+        root.append(card);
+      });
+    }
+
+    document.getElementById("addSectionBtn").addEventListener("click", () => {
+      state.push({
+        id: `section-${Date.now()}`,
+        title: "Новый раздел",
+        badge: "Прайс",
+        items: [{ name: "Новая услуга", duration: "30 мин", price: "1 000 ₽" }]
+      });
+      renderAdmin();
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      savePriceGroups(state);
+      alert("Изменения сохранены. Обновите главную страницу, чтобы увидеть новый прайс.");
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      resetPriceGroups();
+      state = JSON.parse(JSON.stringify(DEFAULT_PRICE_GROUPS));
+      renderAdmin();
+      alert("Прайс сброшен к базовому значению.");
+    });
+
+    renderAdmin();
+  </script>
+</body>
+</html>
