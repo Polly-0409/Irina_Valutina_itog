@@ -21,6 +21,7 @@
       </a>
       <nav id="mainNav">
         <a href="#requests">Запросы</a>
+        <a href="#price">Прайс</a>
         <a href="#about">Обо мне</a>
         <a href="#methods">Методы</a>
         <a href="#reviews">Отзывы</a>
@@ -240,6 +241,64 @@
     </div>
   </section>
 
+  <!-- Price -->
+  <section class="price" id="price">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Прайс</span>
+        <div class="section-divider"></div>
+        <h2>Стоимость услуг по направлениям</h2>
+        <p>Прозрачный прайс в рублях: выбирайте направление, длительность и комфортный формат ухода</p>
+      </div>
+
+      <div class="price-showcase">
+        <article class="price-visual-card reveal stagger-1">
+          <img src="13.PNG" alt="Вакуумно-роликовый массаж LPG">
+          <h3>Аппаратный массаж тела</h3>
+        </article>
+        <article class="price-visual-card reveal stagger-2">
+          <img src="2.PNG" alt="Виброкомпрессионный массаж">
+          <h3>Аппаратный массаж лица</h3>
+        </article>
+        <article class="price-visual-card reveal stagger-3">
+          <img src="9.PNG" alt="Шугаринг">
+          <h3>Депиляция и шугаринг</h3>
+        </article>
+        <article class="price-visual-card reveal stagger-4">
+          <img src="6.PNG" alt="Ультразвуковая чистка лица">
+          <h3>Уходовые процедуры лица</h3>
+        </article>
+      </div>
+
+      <div class="price-groups" id="priceGroups"></div>
+
+      <div class="price-tech-gallery reveal-scale">
+        <h3>Технологии и уход в кабинете</h3>
+        <div class="tech-grid">
+          <figure><img src="1.PNG" alt="LED-маска"><figcaption>LED-маска</figcaption></figure>
+          <figure><img src="2.PNG" alt="Виброкомпрессионный массаж"><figcaption>Виброкомпрессионный массаж</figcaption></figure>
+          <figure><img src="3.PNG" alt="Вибромассаж"><figcaption>Вибромассаж</figcaption></figure>
+          <figure><img src="4.PNG" alt="Миостимуляция"><figcaption>Миостимуляция</figcaption></figure>
+          <figure><img src="5.PNG" alt="RF-лифтинг"><figcaption>RF-лифтинг</figcaption></figure>
+          <figure><img src="6.PNG" alt="Ультразвуковая чистка"><figcaption>Ультразвуковая чистка</figcaption></figure>
+          <figure><img src="7.PNG" alt="Липолазер"><figcaption>Липолазер</figcaption></figure>
+          <figure><img src="8.PNG" alt="Термоодеяло"><figcaption>Термоодеяло</figcaption></figure>
+          <figure><img src="9.PNG" alt="Шугаринг"><figcaption>Шугаринг</figcaption></figure>
+          <figure><img src="10.PNG" alt="Парафинотерапия"><figcaption>Парафинотерапия</figcaption></figure>
+          <figure><img src="11.PNG" alt="Биофатон"><figcaption>Биофатон</figcaption></figure>
+          <figure><img src="12.PNG" alt="Горячий вакуум"><figcaption>Горячий вакуум</figcaption></figure>
+          <figure><img src="13.PNG" alt="Вакуумно-роликовый массаж LPG"><figcaption>Вакуумно-роликовый массаж / LPG</figcaption></figure>
+        </div>
+      </div>
+
+      <div class="price-cta reveal">
+        <p class="price-cta-lead">Не уверены, что выбрать из прайса?</p>
+        <p>На консультации подберем процедуры под ваш запрос, бюджет и желаемый результат.</p>
+        <a href="#cta" class="btn btn-primary">Записаться на консультацию</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Results -->
   <section class="results" id="results">
     <div class="container">
@@ -431,10 +490,42 @@
   <footer>
     <div class="container">
       <p>&copy; 2026 Ирина Валутина. Все права защищены.</p>
+      <div class="footer-links">
+        <a href="privacy.html">Политика конфиденциальности</a>
+        <a href="offer.html">Публичная оферта</a>
+        <a href="admin.html">Админ-панель</a>
+      </div>
     </div>
   </footer>
 
+  <script src="services-data.js"></script>
   <script>
+    function renderPriceGroups() {
+      const wrap = document.getElementById('priceGroups');
+      if (!wrap) return;
+      const groups = getPriceGroups();
+      wrap.innerHTML = groups.map(group => {
+        const items = (group.items || []).map(item => `
+          <li>
+            <span>${item.name || ''}</span>
+            <span>${item.duration || ''}</span>
+            <strong>${item.price || ''}</strong>
+          </li>
+        `).join('');
+        return `
+          <article class="price-group reveal">
+            <div class="price-group-head">
+              <h3>${group.title || 'Раздел'}</h3>
+              <div class="price-group-badge">${group.badge || 'Прайс'}</div>
+            </div>
+            <ul class="price-list">${items}</ul>
+          </article>
+        `;
+      }).join('');
+    }
+
+    renderPriceGroups();
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
